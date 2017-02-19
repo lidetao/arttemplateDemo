@@ -1,0 +1,5 @@
+# arttemplateDemo
+arttemplate使用demo
+
+#arttemplate嵌套子模板，属性不存在时，取值bug与解决办法
+无可置疑，arttemplate是本人用过的最好用的前端模板引擎。不过随着使用的深入与更加广泛，还是遇到了一些梗。下面将较少一个本人遇到的实际问题，分析方法与采用的解决办法。
