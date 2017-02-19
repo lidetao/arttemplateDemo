@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+	<!--
+	作者：1209461019@qq.com
+	时间：2017-02-17
+	描述：arttemplate通过子模板嵌套子模板bug问题
+-->
+
+	<head>
+		<meta charset="UTF-8">
+		<title>arttemplate子模板DEMO</title>
+	</head>
+
+	<body>
+		<div id="demo"></div>
+
+		<!--
+		作者：1209461019@qq.com
+		时间：2017-02-17
+		描述：主模板
+		-->
+		<script type="text/html" id="demo_T">
+			{{each}}
+			<div>姓名：{{$value.name}}</div>
+			<div>性别：{{$value.age}}</div>
+			<!--
+            	作者：1209461019@qq.com
+            	时间：2017-02-17
+            	描述：嵌套子模板
+            -->
+			<div>朋友：{{include 'demo_sub_T' $value.friends}}</div>
+			<hr /> {{/each}}
+		</script>
+		<!--
+        	作者：1209461019@qq.com
+        	时间：2017-02-17
+        	描述：子模板
+        -->
+		<script type="text/html" id="demo_sub_T">
+			{{each debug($data,'子模板')}}
+			<div>朋友姓名：{{$value.name}}</div>
+			<div>朋友年龄:{{$value.age}}</div>{{/each}}
+		</script>
+
+		<script type="text/javascript" src="js/template-debug.js"></script>
+		<script>
+			//数据源
+			var data = [{
+				name: "李德涛",
+				age: 36,
+				friends: [{
+					name: "马三立"
+				}, {
+					name: "冯小刚"
+				}]
+			}, {
+				name: "狗蛋",
+				age: 10
+			}];
+			/**
+			 * <pre>
+			 * 预计结果:
+			 	姓名：李德涛
+				性别：36
+				朋友：
+				朋友姓名：马三立
+				朋友年龄:
+				朋友姓名：冯小刚
+				朋友年龄:
+				
+				姓名：狗蛋
+				性别：10
+				朋友：
+				
+			 * 实际结果：
+			 	姓名：李德涛
+				性别：36
+				朋友：
+				朋友姓名：马三立
+				朋友年龄:
+				朋友姓名：冯小刚
+				朋友年龄:
+				
+				姓名：狗蛋
+				性别：10
+				朋友：
+				朋友姓名：李德涛
+				朋友年龄:36
+				朋友姓名：狗蛋
+				朋友年龄:10
+			 * 
+			 * 错误分析：子模板嵌套时，第二个没有friends属性，而把当前对象进行了赋值
+			 * 
+			 * 
+			 * </pre>
+			 */
+
+			//添加自定义方法，进行子模板调试
+			template.helper("debug", function(data, type) {
+				console.log(type);
+				console.log(JSON.stringify(data));
+				
+				/**
+				 * <pre>
+				 * 打印日志：
+				 	demo-debug.html:100 子模板
+					demo-debug.html:101 [{"name":"马三立"},{"name":"冯小刚"}]
+					demo-debug.html:100 子模板
+					demo-debug.html:101 [{"name":"李德涛","age":36,"friends":[{"name":"马三立"},{"name":"冯小刚"}]},{"name":"狗蛋","age":10}]
+				 * 
+				 * </pre>
+				 */
+				
+				return data;
+			});
+
+			//内容渲染
+			var html = template('demo_T', data);
+			document.getElementById('demo').innerHTML = html;
+		</script>
+	</body>
+
+</html>
